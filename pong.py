@@ -1,7 +1,9 @@
 import math
 import random
+from typing import Set
+from typing import Tuple
 
-import pyxel
+import pyxel  # type: ignore
 
 
 BLACK = 0
@@ -14,28 +16,28 @@ PADDLE_SPEED = 1
 BALL_SIZE = 1
 BALL_SPEED = 1
 BALL_PARAMS = [
-    SCREEN_WIDTH / 2,
-    SCREEN_HEIGHT / 2,
+    SCREEN_WIDTH // 2,
+    SCREEN_HEIGHT // 2,
     random.choice([-2, 2]),
     random.choice([-2, 2])
 ]
 
 
 class Vector:
-    def __init__(self, x, y):
+    def __init__(self, x: int, y: int) -> None:
         self.x = x
         self.y = y
 
 
 class Velocity:
-    def __init__(self, x, y):
-        self.m = math.sqrt(x * x + y * y)
-        self.x = x / self.m * BALL_SPEED
-        self.y = y / self.m * BALL_SPEED
+    def __init__(self, x: int, y: int) -> None:
+        self.m: float = math.sqrt(x * x + y * y)
+        self.x: float = x / self.m * BALL_SPEED
+        self.y: float = y / self.m * BALL_SPEED
 
 
 class HitBox:
-    def __init__(self, x1, y1, x2, y2):
+    def __init__(self, x1: int, y1: int, x2: int, y2: int) -> None:
         self.x1 = x1
         self.y1 = y1
         self.x2 = x2
@@ -43,13 +45,13 @@ class HitBox:
 
 
 class Ball:
-    def __init__(self, px, py, vx, vy):
+    def __init__(self, px: int, py: int, vx: int, vy: int) -> None:
         self.pos = Vector(px, py)
         self.vel = Velocity(vx, vy)
 
-    def update(self):
-        self.pos.x += self.vel.x
-        self.pos.y += self.vel.y
+    def update(self) -> None:
+        self.pos.x += int(self.vel.x)
+        self.pos.y += int(self.vel.y)
 
         # Collision with walls
         if self.pos.y >= SCREEN_HEIGHT - BALL_SIZE:
@@ -57,22 +59,19 @@ class Ball:
         if self.pos.y <= BALL_SIZE:
             self.vel.y = -self.vel.y
 
-    def bounce(self):
+    def bounce(self) -> None:
         self.vel.x = -self.vel.x
         self.vel.y = self.vel.y  # + random.uniform(-1.1, 1.1)
 
-    def restart(self):
-        self.__init__(*BALL_PARAMS)
-
 
 class Paddle:
-    def __init__(self, x, y):
+    def __init__(self, x: int, y: int) -> None:
         self.x = x
         self.y = y
-        self.score = 0
-        self.hitbox = set()
+        self.score: int = 0
+        self.hitbox: Set[Tuple[int, int]] = set()
 
-    def calculate_hitbox(self):
+    def calculate_hitbox(self) -> None:
         self.hitbox.clear()
         for x in range(self.x - 1, self.x + PADDLE_WIDTH + 1):
             for y in range(self.y - 1, self.y + PADDLE_HEIGHT + 1):
@@ -80,7 +79,7 @@ class Paddle:
 
 
 class Pong:
-    def __init__(self):
+    def __init__(self) -> None:
         pyxel.init(
             SCREEN_WIDTH,
             SCREEN_HEIGHT,
@@ -99,7 +98,7 @@ class Pong:
         )
         pyxel.run(self.update, self.draw)
 
-    def update(self):
+    def update(self) -> None:
         self.ball.update()
         self.player_right.calculate_hitbox()
         self.player_left.calculate_hitbox()
@@ -127,19 +126,19 @@ class Pong:
 
         # Goal
         if self.ball.pos.x >= SCREEN_WIDTH - BALL_SIZE:
-            self.ball.restart()
+            self.ball = Ball(*BALL_PARAMS)
             self.player_left.score += 1
         if self.ball.pos.x <= BALL_SIZE:
-            self.ball.restart()
+            self.ball = Ball(*BALL_PARAMS)
             self.player_right.score += 1
 
-    def draw(self):
+    def draw(self) -> None:
         pyxel.cls(BLACK)
 
         # Ball
         pyxel.circ(
-            self.ball.pos.x,
-            self.ball.pos.y,
+            int(self.ball.pos.x),
+            int(self.ball.pos.y),
             BALL_SIZE,
             WHITE
         )
