@@ -7,9 +7,11 @@ import pyxel
 BLACK = 0
 WHITE = 7
 SCREEN_WIDTH = 256
-SCREEN_HEIGHT = 256
-PADDLE_SIZE = 5
-BALL_SIZE = 3
+SCREEN_HEIGHT = 128
+PADDLE_WIDTH = 2
+PADDLE_HEIGHT = PADDLE_WIDTH * 7
+PADDLE_SPEED = 1
+BALL_SIZE = 1
 BALL_SPEED = 1
 BALL_PARAMS = [
     SCREEN_WIDTH / 2,
@@ -68,102 +70,107 @@ class Paddle:
         self.x = x
         self.y = y
         self.score = 0
-        self.hitbox = []
+        self.hitbox = set()
 
     def calculate_hitbox(self):
         self.hitbox.clear()
-        for x in range(self.x - 1, self.x + PADDLE_SIZE + 1):
-            for y in range(self.y - 1, self.y + PADDLE_SIZE * 5 + 1):
-                self.hitbox.append((x, y))
+        for x in range(self.x - 1, self.x + PADDLE_WIDTH + 1):
+            for y in range(self.y - 1, self.y + PADDLE_HEIGHT + 1):
+                self.hitbox.add((x, y))
 
 
 class Pong:
     def __init__(self):
         pyxel.init(SCREEN_WIDTH, SCREEN_HEIGHT, caption="Pong", fps=60, quit_key=pyxel.KEY_ESCAPE)
-        self.playing = False
         self.ball = Ball(*BALL_PARAMS)
-        self.player_left = Paddle(0, SCREEN_HEIGHT // 2)
-        self.player_right = Paddle(SCREEN_WIDTH - 5, SCREEN_HEIGHT // 2)
+        self.player_left = Paddle(SCREEN_WIDTH - SCREEN_WIDTH, SCREEN_HEIGHT // 2)
+        self.player_right = Paddle(SCREEN_WIDTH - PADDLE_WIDTH, SCREEN_HEIGHT // 2)
         pyxel.run(self.update, self.draw)
 
     def update(self):
-        if not self.playing and pyxel.btn(pyxel.KEY_ENTER):
-            self.playing = True
-        elif self.playing:
-            self.ball.update()
-            self.player_right.calculate_hitbox()
-            self.player_left.calculate_hitbox()
+        self.ball.update()
+        self.player_right.calculate_hitbox()
+        self.player_left.calculate_hitbox()
 
-            # Paddles Movement
-            if pyxel.btn(pyxel.KEY_W) or pyxel.btn(pyxel.GAMEPAD_1_UP):
-                if self.player_left.y > 2:
-                    self.player_left.y -= 2
-            if pyxel.btn(pyxel.KEY_S) or pyxel.btn(pyxel.GAMEPAD_1_DOWN):
-                if self.player_left.y < 229:
-                    self.player_left.y += 2
-            if pyxel.btn(pyxel.KEY_UP) or pyxel.btn(pyxel.GAMEPAD_2_UP):
-                if self.player_right.y > 2:
-                    self.player_right.y -= 2
-            if pyxel.btn(pyxel.KEY_DOWN) or pyxel.btn(pyxel.GAMEPAD_2_DOWN):
-                if self.player_right.y < 229:
-                    self.player_right.y += 2
+        # Paddles Movement
+        if pyxel.btn(pyxel.KEY_W) or pyxel.btn(pyxel.GAMEPAD_1_UP):
+            if self.player_left.y > SCREEN_HEIGHT - SCREEN_HEIGHT:
+                self.player_left.y -= PADDLE_SPEED
+        if pyxel.btn(pyxel.KEY_S) or pyxel.btn(pyxel.GAMEPAD_1_DOWN):
+            if self.player_left.y < SCREEN_HEIGHT - PADDLE_HEIGHT:
+                self.player_left.y += PADDLE_SPEED
+        if pyxel.btn(pyxel.KEY_UP) or pyxel.btn(pyxel.GAMEPAD_2_UP):
+            if self.player_right.y > SCREEN_HEIGHT - SCREEN_HEIGHT:
+                self.player_right.y -= PADDLE_SPEED
+        if pyxel.btn(pyxel.KEY_DOWN) or pyxel.btn(pyxel.GAMEPAD_2_DOWN):
+            if self.player_right.y < SCREEN_HEIGHT - PADDLE_HEIGHT:
+                self.player_right.y += PADDLE_SPEED
 
-            # Collision with Paddles
-            if (int(self.ball.pos.x), int(self.ball.pos.y)) in self.player_right.hitbox:
-                self.ball.bounce()
-            if (int(self.ball.pos.x), int(self.ball.pos.y)) in self.player_left.hitbox:
-                self.ball.bounce()
+        # Collision with Paddles
+        if (int(self.ball.pos.x), int(self.ball.pos.y)) in self.player_right.hitbox:
+            self.ball.bounce()
+        if (int(self.ball.pos.x), int(self.ball.pos.y)) in self.player_left.hitbox:
+            self.ball.bounce()
 
-            # Goal
-            if self.ball.pos.x >= SCREEN_WIDTH - BALL_SIZE:
-                self.ball.restart()
-                self.player_left.score += 1
-            if self.ball.pos.x <= BALL_SIZE:
-                self.ball.restart()
-                self.player_right.score += 1
+        # Goal
+        if self.ball.pos.x >= SCREEN_WIDTH - BALL_SIZE:
+            self.ball.restart()
+            self.player_left.score += 1
+        if self.ball.pos.x <= BALL_SIZE:
+            self.ball.restart()
+            self.player_right.score += 1
 
     def draw(self):
-        if self.playing:
-            pyxel.cls(BLACK)
+        pyxel.cls(BLACK)
 
-            # Ball
-            pyxel.circ(self.ball.pos.x, self.ball.pos.y, BALL_SIZE, WHITE)
+        # Ball
+        pyxel.circ(
+            self.ball.pos.x,
+            self.ball.pos.y,
+            BALL_SIZE,
+            WHITE
+        )
 
-            # Paddles
-            pyxel.rect(
-                self.player_left.x,
-                self.player_left.y,
-                PADDLE_SIZE,
-                PADDLE_SIZE * 5,
-                WHITE
-            )
-            pyxel.rect(
-                self.player_right.x,
-                self.player_right.y,
-                PADDLE_SIZE,
-                PADDLE_SIZE * 5,
-                WHITE
-            )
+        # Paddles
+        pyxel.rect(
+            self.player_left.x,
+            self.player_left.y,
+            PADDLE_WIDTH,
+            PADDLE_HEIGHT,
+            WHITE
+        )
+        pyxel.rect(
+            self.player_right.x,
+            self.player_right.y,
+            PADDLE_WIDTH,
+            PADDLE_HEIGHT,
+            WHITE
+        )
 
-            # Top Bar
-            pyxel.line(0, 0, 256, 0, WHITE)
-            pyxel.line(0, 1, 256, 1, WHITE)
+        # Middle Line
+        pyxel.line(
+            SCREEN_WIDTH // 2,
+            SCREEN_HEIGHT - SCREEN_HEIGHT,
+            SCREEN_WIDTH // 2,
+            SCREEN_HEIGHT,
+            WHITE
+        )
 
-            # Bottom Bar
-            pyxel.line(0, 255, 256, 255, WHITE)
-            pyxel.line(0, 254, 256, 254, WHITE)
+        # Left Score
+        pyxel.text(
+            SCREEN_WIDTH // 2 - 7,
+            SCREEN_HEIGHT - SCREEN_HEIGHT,
+            str(self.player_left.score),
+            WHITE
+        )
 
-            # Middle Bar
-            pyxel.line(127, 0, 127, 254, WHITE)
-            pyxel.line(128, 0, 128, 254, WHITE)
-
-            # Left Score
-            pyxel.text(120, 5, str(self.player_left.score), WHITE)
-
-            # Right Score
-            pyxel.text(133, 5, str(self.player_right.score), WHITE)
-        else:
-            pyxel.text(90, 128, "Press ENTER to start", WHITE)
+        # Right Score
+        pyxel.text(
+            SCREEN_WIDTH // 2 + 5,
+            SCREEN_HEIGHT - SCREEN_HEIGHT,
+            str(self.player_right.score),
+            WHITE
+        )
 
 
 if __name__ == '__main__':
