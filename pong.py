@@ -81,10 +81,22 @@ class Paddle:
 
 class Pong:
     def __init__(self):
-        pyxel.init(SCREEN_WIDTH, SCREEN_HEIGHT, caption="Pong", fps=60, quit_key=pyxel.KEY_ESCAPE)
+        pyxel.init(
+            SCREEN_WIDTH,
+            SCREEN_HEIGHT,
+            caption="Pong",
+            fps=60,
+            quit_key=pyxel.KEY_ESCAPE
+        )
         self.ball = Ball(*BALL_PARAMS)
-        self.player_left = Paddle(SCREEN_WIDTH - SCREEN_WIDTH, SCREEN_HEIGHT // 2)
-        self.player_right = Paddle(SCREEN_WIDTH - PADDLE_WIDTH, SCREEN_HEIGHT // 2)
+        self.player_left = Paddle(
+            SCREEN_WIDTH - SCREEN_WIDTH,
+            SCREEN_HEIGHT // 2
+        )
+        self.player_right = Paddle(
+            SCREEN_WIDTH - PADDLE_WIDTH,
+            SCREEN_HEIGHT // 2
+        )
         pyxel.run(self.update, self.draw)
 
     def update(self):
@@ -107,9 +119,10 @@ class Pong:
                 self.player_right.y += PADDLE_SPEED
 
         # Collision with Paddles
-        if (int(self.ball.pos.x), int(self.ball.pos.y)) in self.player_right.hitbox:
+        ball_position = (int(self.ball.pos.x), int(self.ball.pos.y))
+        if ball_position in self.player_right.hitbox:
             self.ball.bounce()
-        if (int(self.ball.pos.x), int(self.ball.pos.y)) in self.player_left.hitbox:
+        if ball_position in self.player_left.hitbox:
             self.ball.bounce()
 
         # Goal
