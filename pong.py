@@ -15,9 +15,7 @@ BALL_SIZE = 1
 BALL_SPEED = 1
 BALL_PARAMS = [
     SCREEN_WIDTH / 2,
-    SCREEN_HEIGHT / 2,
-    random.choice([-2, 2]),
-    random.choice([-2, 2])
+    SCREEN_HEIGHT / 2
 ]
 
 
@@ -43,9 +41,12 @@ class HitBox:
 
 
 class Ball:
-    def __init__(self, px, py, vx, vy):
+    def __init__(self, px, py):
         self.pos = Vector(px, py)
-        self.vel = Velocity(vx, vy)
+        self.vel = Velocity(
+            random.choice([-2, 2]),
+            random.choice([-2, 2])
+        )
 
     def update(self):
         self.pos.x += self.vel.x
@@ -60,9 +61,6 @@ class Ball:
     def bounce(self):
         self.vel.x = -self.vel.x
         self.vel.y = self.vel.y  # + random.uniform(-1.1, 1.1)
-
-    def restart(self):
-        self.__init__(*BALL_PARAMS)
 
 
 class Paddle:
@@ -127,10 +125,10 @@ class Pong:
 
         # Goal
         if self.ball.pos.x >= SCREEN_WIDTH - BALL_SIZE:
-            self.ball.restart()
+            self.ball = Ball(*BALL_PARAMS)
             self.player_left.score += 1
         if self.ball.pos.x <= BALL_SIZE:
-            self.ball.restart()
+            self.ball = Ball(*BALL_PARAMS)
             self.player_right.score += 1
 
     def draw(self):
@@ -138,8 +136,8 @@ class Pong:
 
         # Ball
         pyxel.circ(
-            self.ball.pos.x,
-            self.ball.pos.y,
+            int(self.ball.pos.x),
+            int(self.ball.pos.y),
             BALL_SIZE,
             WHITE
         )
