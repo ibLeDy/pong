@@ -1,4 +1,4 @@
-# [WIP] Pong
+# Pong [WIP]
 
 [Pyxel](https://github.com/kitao/pyxel) implementation of the classic game of Pong!
 
@@ -7,4 +7,4 @@
 - No win condition atm
 - Simple physics
 - No sound
-- No Power-Ups
+- No power-ups
