@@ -1,5 +1,7 @@
 # Pong [WIP]
 
+![Screenshot](screenshot.png)
+
 [Pyxel](https://github.com/kitao/pyxel) implementation of the classic game of Pong!
 
 - Left paddle is controlled with __W__ and __S__
