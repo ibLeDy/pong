@@ -25,8 +25,8 @@ BALL_PARAMS = [
 
 class Vector:
     def __init__(self, x: int, y: int) -> None:
-        self.x = x
-        self.y = y
+        self.x = float(x)
+        self.y = float(y)
 
 
 class Velocity:
@@ -50,8 +50,8 @@ class Ball:
         self.vel = Velocity(vx, vy)
 
     def update(self) -> None:
-        self.pos.x += int(self.vel.x)
-        self.pos.y += int(self.vel.y)
+        self.pos.x += self.vel.x
+        self.pos.y += self.vel.y
 
         # Collision with walls
         if self.pos.y >= SCREEN_HEIGHT - BALL_SIZE:
