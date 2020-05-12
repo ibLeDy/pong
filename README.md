@@ -1,6 +1,6 @@
 # Pong [WIP]
 
-![Screenshot](screenshot.png)
+![demo](demo.gif)
 
 [Pyxel](https://github.com/kitao/pyxel) implementation of the classic game of Pong!
 
