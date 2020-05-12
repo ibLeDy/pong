@@ -14,15 +14,15 @@ PADDLE_SPEED = 1
 BALL_SIZE = 1
 BALL_SPEED = 1
 BALL_PARAMS = [
-    SCREEN_WIDTH / 2,
-    SCREEN_HEIGHT / 2
+    SCREEN_WIDTH // 2,
+    SCREEN_HEIGHT // 2
 ]
 
 
 class Vector:
     def __init__(self, x, y):
-        self.x = x
-        self.y = y
+        self.x = float(x)
+        self.y = float(y)
 
 
 class Velocity:
