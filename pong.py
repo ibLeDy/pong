@@ -17,9 +17,7 @@ BALL_SIZE = 1
 BALL_SPEED = 1
 BALL_PARAMS = [
     SCREEN_WIDTH // 2,
-    SCREEN_HEIGHT // 2,
-    random.choice([-2, 2]),
-    random.choice([-2, 2])
+    SCREEN_HEIGHT // 2
 ]
 
 
@@ -45,9 +43,12 @@ class HitBox:
 
 
 class Ball:
-    def __init__(self, px: int, py: int, vx: int, vy: int) -> None:
+    def __init__(self, px: int, py: int) -> None:
         self.pos = Vector(px, py)
-        self.vel = Velocity(vx, vy)
+        self.vel = Velocity(
+            random.choice([-2, 2]),
+            random.choice([-2, 2])
+        )
 
     def update(self) -> None:
         self.pos.x += self.vel.x
